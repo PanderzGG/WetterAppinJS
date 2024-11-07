@@ -1,0 +1,35 @@
+// main.scss
+
+// Bootstrap-Variablen für dunkles Thema überschreiben
+$body-bg: #121212;
+$body-color: #ffffff;
+$navbar-dark-bg: #1f1f1f;
+$card-bg: #1e1e1e;
+$card-border-color: #333333;
+
+// Importieren von Bootstrap
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+// Eigene Anpassungen
+.container {
+  padding-top: 20px;
+}
+
+h2, h3 {
+  color: #ffffff;
+}
+
+button {
+  background-color: #343a40;
+  border: none;
+
+  &:hover {
+    background-color: #495057;
+  }
+}
+
+.navContext{
+    background-color: #1f1f1f;
+}
+// Importieren von Bootstrap
+@import "../node_modules/bootstrap/scss/bootstrap";

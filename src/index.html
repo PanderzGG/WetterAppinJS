@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wetter-App</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { gui } from './gui.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let wetterapp = new gui('Wetter-App');
+            wetterapp.initGUI();
+        });
+    </script>
+</head>
+<body class="bg-dark text-white">
+  
+</body>
+</html>
