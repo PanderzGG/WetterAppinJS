@@ -39,4 +39,5 @@ export class stadtanzeige {
             throw error;
         }
     }
+    
 }

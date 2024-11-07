@@ -147,6 +147,21 @@ export class gui {
         stadt.classList.add('mt-1');
         stadtCol.appendChild(stadt);
 
+        // Zeit der Daten
+        let timeCol = document.createElement('div');
+        timeCol.classList.add('col-md-3');
+        weatherRow.appendChild(timeCol);
+
+        let timelabel = document.createElement('label');
+        timelabel.innerText = 'Zeit:';
+        timelabel.classList.add('form-label');
+        timeCol.appendChild(timelabel);
+
+        let curtime = document.createElement('h3');
+        curtime.innerText = 'N/A';
+        curtime.classList.add('mt-1');
+        timeCol.appendChild(curtime);
+
         // Temperatur
         let tempCol = document.createElement('div');
         tempCol.classList.add('col-md-3');
@@ -162,10 +177,15 @@ export class gui {
         curTemp.classList.add('mt-1');
         tempCol.appendChild(curTemp);
 
+        // Windgeschwindigkeit Row
+        let windRow = document.createElement('div');
+        windRow.classList.add('row', 'mt-4');
+        mainContainer.appendChild(windRow);
+
         // Sonnenaufgang
         let sunriseCol = document.createElement('div');
         sunriseCol.classList.add('col-md-3');
-        weatherRow.appendChild(sunriseCol);
+        windRow.appendChild(sunriseCol);
 
         let sunriseLabel = document.createElement('label');
         sunriseLabel.innerText = 'Sonnenaufgang:';
@@ -180,7 +200,7 @@ export class gui {
         // Sonnenuntergang
         let sunsetCol = document.createElement('div');
         sunsetCol.classList.add('col-md-3');
-        weatherRow.appendChild(sunsetCol);
+        windRow.appendChild(sunsetCol);
 
         let sunsetLabel = document.createElement('label');
         sunsetLabel.innerText = 'Sonnenuntergang:';
@@ -191,11 +211,6 @@ export class gui {
         sunsettime.innerText = '';
         sunsettime.classList.add('mt-1');
         sunsetCol.appendChild(sunsettime);
-
-        // Windgeschwindigkeit Row
-        let windRow = document.createElement('div');
-        windRow.classList.add('row', 'mt-4');
-        mainContainer.appendChild(windRow);
 
         let windCol = document.createElement('div');
         windCol.classList.add('col-md-6');
@@ -215,7 +230,6 @@ export class gui {
             // Wetterdaten abrufen und Temperatur anzeigen
             const data = await this.stadtanzeige.getCityData(51.0654, 6.0967);
 
-            // Überprüfen, ob die Daten die erwartete Struktur haben
             if (data && data.current_weather && typeof data.current_weather.temperature === 'number') {
                 // Temperatur aus dem JSON extrahieren
                 const temperature = data.current_weather.temperature;
@@ -255,6 +269,12 @@ export class gui {
                 console.error('Ungültige Datenstruktur für Windgeschwindigkeit:', data);
                 windspeed.innerText = 'Windgeschwindigkeit nicht verfügbar';
             }
+
+            if (data && data.current_weather && typeof data.current_weather.time === 'string') {
+                const curTime = new Date(data.current_weather.time).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                curtime.innerText = `${curTime} Uhr`;
+            }
+            
 
         } catch (error) {
             console.error('Fetch-Fehler:', error);
