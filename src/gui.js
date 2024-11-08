@@ -1,11 +1,13 @@
 import { blaender } from './blaender.js'; 
 import { stadtanzeige } from './stadtanzeige.js';
+import { createStadt } from './createstadt.js';
 
 export class gui {
     constructor(titel){
         this.titel = titel;
         this.blaender = new blaender();
         this.stadtanzeige = new stadtanzeige();
+        this.createStadt = new createStadt();
     }
 
     async initGUI(){
@@ -143,7 +145,7 @@ export class gui {
         stadtCol.appendChild(stadtLabel);
 
         let stadt = document.createElement('h3');
-        stadt.innerText = 'Heinsberg';
+        stadt.innerText = '';
         stadt.classList.add('mt-1');
         stadtCol.appendChild(stadt);
 
@@ -226,63 +228,100 @@ export class gui {
         windspeed.classList.add('mt-1');
         windCol.appendChild(windspeed);
 
-        try {
-            // Wetterdaten abrufen und Temperatur anzeigen
-            const data = await this.stadtanzeige.getCityData(51.0654, 6.0967);
-
-            if (data && data.current_weather && typeof data.current_weather.temperature === 'number') {
-                // Temperatur aus dem JSON extrahieren
-                const temperature = data.current_weather.temperature;
-                
-                // Anzeigeelement aktualisieren
-                curTemp.innerText = `${temperature}°C`;
-            } else {
-                console.error('Ungültige Datenstruktur:', data);
-                curTemp.innerText = 'Daten nicht verfügbar';
-            }
-
-            // Sonnenaufgang extrahieren und anzeigen
-            if (data && data.daily && data.daily.sunrise && data.daily.sunrise.length > 0) {
-                const sunrise = data.daily.sunrise[0];
-                const sunriseTime = new Date(sunrise).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-                sunrisetime.innerText = `${sunriseTime} Uhr`;
-            } else {
-                console.error('Ungültige Datenstruktur für Sonnenaufgang:', data);
-                sunrisetime.innerText = 'Sonnenaufgang nicht verfügbar';
-            }
-
-            // Sonnenuntergang
-            if (data && data.daily && data.daily.sunset && data.daily.sunset.length > 0) {
-                const sunset = data.daily.sunset[0];
-                const sunsetTime = new Date(sunset).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-                sunsettime.innerText = `${sunsetTime} Uhr`;
-            } else {
-                console.error('Ungültige Datenstruktur für Sonnenuntergang:', data);
-                sunsettime.innerText = 'Sonnenuntergang nicht verfügbar';
-            }
-
-            // Windgeschwindigkeit
-            if (data && data.current_weather && typeof data.current_weather.windspeed === 'number') {
-                const windSpeed = data.current_weather.windspeed;
-                windspeed.innerText = `${windSpeed} km/h`;
-            } else {
-                console.error('Ungültige Datenstruktur für Windgeschwindigkeit:', data);
-                windspeed.innerText = 'Windgeschwindigkeit nicht verfügbar';
-            }
-
-            if (data && data.current_weather && typeof data.current_weather.time === 'string') {
-                const curTime = new Date(data.current_weather.time).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-                curtime.innerText = `${curTime} Uhr`;
-            }
+        
+        // Event-Listener-Funktion als async deklarieren
+        btnSearch.addEventListener('click', async function(event){
+            const curstadt = new stadtanzeige();
             
+            try {
+                const cityLocationData = await curstadt.getCityLocation(inputSearch.value);
+                if (cityLocationData && cityLocationData.results && cityLocationData.results.length > 0) {
+                    const latitude = cityLocationData.results[0].latitude;
+                    const longitude = cityLocationData.results[0].longitude;
+                    console.log('Koordinaten:', latitude, longitude);
 
-        } catch (error) {
-            console.error('Fetch-Fehler:', error);
-            curTemp.innerText = 'Fehler beim Laden der Daten';
-            sunrisetime.innerText = 'Fehler beim Laden der Daten';
-            sunsettime.innerText = 'Fehler beim Laden der Daten';
-            windspeed.innerText = 'Fehler beim Laden der Daten';
-        }
+                    // Wetterdaten mit den abgerufenen Koordinaten abrufen
+                    const data = await curstadt.getCityData(latitude, longitude);
+
+                    if (data && data.current_weather && data.daily) {
+                        // Temperatur anzeigen
+                        if (typeof data.current_weather.temperature === 'number') {
+                            const temperature = data.current_weather.temperature;
+                            curTemp.innerText = `${temperature}°C`;
+                            
+                            
+                        } else {
+                            console.error('Ungültige Temperaturdaten:', data);
+                            curTemp.innerText = 'Daten nicht verfügbar';
+                        }
+
+                        // Sonnenaufgang anzeigen
+                        if (Array.isArray(data.daily.sunrise) && data.daily.sunrise.length > 0) {
+                            const sunriseTime = new Date(data.daily.sunrise[0]).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                            sunrisetime.innerText = `${sunriseTime} Uhr`;
+                        } else {
+                            console.error('Ungültige Sonnenaufgangsdaten:', data);
+                            sunrisetime.innerText = 'Daten nicht verfügbar';
+                        }
+
+                        // Sonnenuntergang anzeigen
+                        if (Array.isArray(data.daily.sunset) && data.daily.sunset.length > 0) {
+                            const sunsetTime = new Date(data.daily.sunset[0]).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                            sunsettime.innerText = `${sunsetTime} Uhr`;
+                        } else {
+                            console.error('Ungültige Sonnenuntergangsdaten:', data);
+                            sunsettime.innerText = 'Daten nicht verfügbar';
+                        }
+
+                        // Windgeschwindigkeit anzeigen
+                        if (typeof data.current_weather.windspeed === 'number') {
+                            windspeed.innerText = `${data.current_weather.windspeed} km/h`;
+                        } else {
+                            console.error('Ungültige Windgeschwindigkeitsdaten:', data);
+                            windspeed.innerText = 'Daten nicht verfügbar';
+                        }
+
+                        // Zeit anzeigen
+                        if (typeof data.current_weather.time === 'string') {
+                            const curTime = new Date(data.current_weather.time).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                            curtime.innerText = `${curTime} Uhr`;
+                        } else {
+                            console.error('Ungültige Zeitdaten:', data);
+                            curtime.innerText = 'Daten nicht verfügbar';
+                        }
+
+                        // Stadtname aktualisieren
+                        if (cityLocationData && cityLocationData.results && cityLocationData.results[0]) {
+                            stadt.innerText = cityLocationData.results[0].name;
+                        } else {
+                            console.error('Ungültige Stadtinformationen:', cityLocationData);
+                            stadt.innerText = 'Unbekannt';
+                        }
+
+                        if (cityLocationData && cityLocationData.results && cityLocationData.results[0]) {
+                            locationLabel.innerText = cityLocationData.results[0].admin1;
+                        } else {
+                            console.error('Ungültige Stadtinformationen:', cityLocationData);
+                            locationLabel.innerText = 'Unbekannt';
+                        }
+                    } else {
+                        console.error('Ungültige Datenstruktur:', data);
+                        curTemp.innerText = 'Daten nicht verfügbar';
+                        sunrisetime.innerText = 'Daten nicht verfügbar';
+                        sunsettime.innerText = 'Daten nicht verfügbar';
+                        windspeed.innerText = 'Daten nicht verfügbar';
+                        curtime.innerText = 'Daten nicht verfügbar';
+                        stadt.innerText = 'Unbekannt';
+                    }
+
+                } else {
+                    console.error('Keine Ergebnisse von getCityLocation');
+                    stadt.innerText = 'Stadt nicht gefunden';
+                }
+            } catch (error) {
+                console.error('Fehler beim Abrufen der Daten:', error);
+            }
+        });
 
         // Elemente zum Dokument hinzufügen
         document.body.appendChild(headerDiv);

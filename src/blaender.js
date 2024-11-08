@@ -21,7 +21,6 @@ export class blaender {
             abland.classList.add('dropdown-item');
             abland.href = '#';
             abland.innerText = bland;
-            console.log(bland);
             libland.appendChild(abland);
         }
     }

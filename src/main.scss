@@ -1,35 +1,67 @@
 // main.scss
 
-// Bootstrap-Variablen für dunkles Thema überschreiben
+// Override Bootstrap Variables for Dark Theme
 $body-bg: #121212;
 $body-color: #ffffff;
-$navbar-dark-bg: #1f1f1f;
+$navbar-bg: #1f1f1f;
+$navbar-color: #ffffff;
 $card-bg: #1e1e1e;
 $card-border-color: #333333;
 
-// Importieren von Bootstrap
+// Dropdown Menü Hintergrundfarben
+$dropdown-bg: $navbar-bg;
+$dropdown-link-color: $body-color;
+$dropdown-link-hover-bg: darken($navbar-bg, 10%);
+$dropdown-link-hover-color: $body-color;
+
+// Import Bootstrap
 @import "../node_modules/bootstrap/scss/bootstrap";
 
-// Eigene Anpassungen
+// Custom Styles
+body {
+  background-color: $body-bg;
+  color: $body-color;
+}
+
 .container {
   padding-top: 20px;
 }
 
-h2, h3 {
-  color: #ffffff;
+h1, h2, h3, label {
+  color: $body-color;
 }
 
-button {
+.navbar {
+  background-color: $navbar-bg;
+  .navbar-brand, .nav-link {
+    color: $navbar-color;
+    &:hover {
+      color: lighten($navbar-color, 10%);
+    }
+  }
+  .navbar-toggler {
+    border-color: $navbar-color;
+    .navbar-toggler-icon {
+      filter: invert(1);
+    }
+  }
+}
+
+button, .btn {
   background-color: #343a40;
   border: none;
-
+  color: $body-color;
   &:hover {
     background-color: #495057;
   }
 }
 
-.navContext{
-    background-color: #1f1f1f;
+.form-control {
+  background-color: $card-bg;
+  border: 1px solid $card-border-color;
+  color: $body-color;
+  &:focus {
+    background-color: lighten($card-bg, 5%);
+    border-color: lighten($card-border-color, 10%);
+  }
 }
-// Importieren von Bootstrap
-@import "../node_modules/bootstrap/scss/bootstrap";

@@ -2,6 +2,32 @@
 export class stadtanzeige {
     constructor() {
         this.curTemp = 0; // Aktuelle Temperatur wird initialisiert
+        this.city = ''; // Name der Stadt wird initialisiert
+        this.postcode = 0; // Postleitzahl wird initialisiert
+    }
+
+
+    async getCityLocation(city) {
+        if (typeof city !== 'string') {
+            console.error('Ungültige Werte für Stadt oder Postleitzahl');
+            return Promise.reject('Ungültige Werte für Stadt oder Postleitzahl');
+        }
+
+        const targetUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=10&language=de&format=json`;
+
+        try {
+            const response = await fetch(targetUrl);
+
+            if (!response.ok) {
+                throw new Error('Netzwerk-Antwort war nicht OK: ' + response.statusText);
+            }
+            
+            const cityData = await response.json();
+            return cityData;
+        } catch (error) { 
+            console.error('Fetch-Fehler:', error);
+            throw error;
+        }
     }
 
     // Methode zum Abrufen der Wetterdaten basierend auf Latitude und Longitude
